@@ -3,7 +3,7 @@ import { FormArray, FormControl, FormGroup } from "@angular/forms";
 import { Observable } from "rxjs";
 
 @Component({
-  selector: "app-query-builder",
+  selector: "query-builder",
   templateUrl: "./query-builder.component.html",
   styleUrls: ["./query-builder.component.css"]
 })
