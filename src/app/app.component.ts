@@ -1,10 +1,21 @@
-import { Component, VERSION } from '@angular/core';
+import { Component, OnInit, VERSION } from "@angular/core";
+import { FormArray, FormControl, FormGroup, Validators } from "@angular/forms";
 
 @Component({
-  selector: 'my-app',
-  templateUrl: './app.component.html',
-  styleUrls: [ './app.component.css' ]
+  selector: "my-app",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.css"]
 })
-export class AppComponent  {
-  name = 'Angular ' + VERSION.major;
+export class AppComponent implements OnInit {
+  queryForm: FormGroup;
+  name = "Angular " + VERSION.major;
+
+  ngOnInit(): void {
+    this.queryForm = new FormGroup({
+      id: new FormControl("q-" + new Date().getTime(), Validators.required),
+      dataset: new FormControl(""),
+      columns: new FormArray([]),
+      filters: new FormGroup({})
+    });
+  }
 }
