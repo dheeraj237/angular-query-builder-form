@@ -8,7 +8,6 @@ import { FormArray, FormControl, FormGroup, Validators } from "@angular/forms";
 })
 export class AppComponent implements OnInit {
   queryForm: FormGroup;
-  name = "Angular " + VERSION.major;
 
   ngOnInit(): void {
     this.queryForm = new FormGroup({
