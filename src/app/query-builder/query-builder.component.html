@@ -1,5 +1,5 @@
-<p style="color: grey;" *ngIf="filterString">
-	Expression = {{filterString}}
+<p>
+	Expression = {{filterString ? filterString: '()'}}
 </p>
 <form [formGroup]="filterForm">
 	<ng-template #queryTemplateRef let-filter='filter' let-groupToRemove='groupToRemove'>
@@ -7,22 +7,22 @@
 			<div class="row">
 				<!-- logical operators -->
 				<!-- <select class="form-control input-sm"></select> -->
-				<div class="col-2">
+				<div class="col">
 					<input class="form-control" type="text" formControlName="logicalOperator">
 				</div>
-					<div class="col-2">
+					<div class="col p-0">
 						<button style="margin-left: 5px" (click)="addField(filter)" class="btn btn-sm btn-success">
 						<span class="glyphicon glyphicon-plus-sign"></span>
 						Add Field
 					</button>
 					</div>
-					<div class="col-2">
+					<div class="col p-0">
 						<button style="margin-left: 5px" (click)="addGroup(filter)" class="btn btn-sm btn-success">
 						<span class="glyphicon glyphicon-plus-sign"></span>
 						Add Group
 					</button>
 					</div>
-					<div class="col-6">
+					<div class="col p-0">
 						<button *ngIf="groupToRemove" style="margin-left: 5px" (click)="removeGroup(groupToRemove)"
 						class="btn btn-sm btn-danger">
 						<span class="glyphicon glyphicon-minus-sign"></span>
