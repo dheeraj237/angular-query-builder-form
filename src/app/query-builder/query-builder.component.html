@@ -1,4 +1,4 @@
-<p>
+<p class="p-2">
 	Expression = {{filterString ? filterString: '()'}}
 </p>
 <form [formGroup]="filterForm">
@@ -68,3 +68,7 @@
 		[ngTemplateOutletContext]="{ filter: filterForm, removeGroup: null }">
 	</ng-template>
 </form>
+
+<div class="row m-2 p-1" style="background: grey">
+	JSON: {{filterForm.value | json}}
+</div>

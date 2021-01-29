@@ -33,46 +33,6 @@ export class QueryBuilderComponent implements OnInit {
       logicalOperator: new FormControl("AND", Validators.required),
       filters: new FormArray([])
     });
-    // this.filterForm.disable();
-    // this.queryForm.controls.filters = new FormGroup({
-    // 	logicalOperator: new FormControl("OR"),
-    // 	filters: new FormArray([
-    // 		new FormGroup({
-    // 			logicalOperator: new FormControl("AND"),
-    // 			filters: new FormArray([
-    // 				new FormGroup({
-    // 					name: new FormControl("3333"),
-    // 					type: new FormControl("string"),
-    // 					value: new FormControl("3333"),
-    // 					relationalOperator: new FormControl("="),
-    // 					filters: new FormArray([]),
-    // 				}),
-    // 				new FormGroup({
-    // 					name: new FormControl("4444"),
-    // 					type: new FormControl("string"),
-    // 					value: new FormControl("4444"),
-    // 					relationalOperator: new FormControl("="),
-    // 					filters: new FormArray([]),
-    // 				}),
-    // 			]),
-    // 		}),
-    // 		new FormGroup({
-    // 			name: new FormControl("2222"),
-    // 			type: new FormControl("string"),
-    // 			value: new FormControl("2222"),
-    // 			relationalOperator: new FormControl("="),
-    // 			filters: new FormArray([]),
-    // 		}),
-    // 	]),
-    // });
-
-    // this.queryForm.controls.columns.valueChanges.subscribe((value) => {
-    // 	if (value.length !== 0 && value[0].groupingType) {
-    // 		this.filterForm.enable();
-    // 	} else {
-    // 		this.filterForm.enable();
-    // 	}
-    // });
 
     this.filterForm.valueChanges.subscribe(value => {
       if (value) {
