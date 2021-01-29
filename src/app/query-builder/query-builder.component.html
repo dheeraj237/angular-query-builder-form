@@ -1,40 +1,70 @@
-<p>
-	Result - {{filterString}}
-	===================================================
+<p style="color: grey;" *ngIf="filterString">
+	Expression = {{filterString}}
 </p>
-
-<div class="alert alert-warning alert-group">
-	<div class="form-inline">
-		<select ng-options="o.name as o.name for o in operators" ng-model="group.operator" class="form-control input-sm"></select>
-		<button style="margin-left: 5px" ng-click="addCondition()" class="btn btn-sm btn-success">
-      <span class="glyphicon glyphicon-plus-sign"></span>
-      Add Condition
-    </button>
-		<button style="margin-left: 5px" ng-click="addGroup()" class="btn btn-sm btn-success">
-      <span class="glyphicon glyphicon-plus-sign"></span>
-      Add Group
-      </button>
-		<button style="margin-left: 5px" ng-click="removeGroup()" class="btn btn-sm btn-danger">
-      <span class="glyphicon glyphicon-minus-sign"></span>
-      Remove Group
-      </button>
-	</div>
-	<div class="group-conditions">
-		<div ng-repeat="rule in group.rules | orderBy:'index'" class="condition">
-			<div ng-switch="rule.hasOwnProperty('group')">
-				<div ng-switch-when="true">
-          <!-- nested filter -->
-					<query-builder group="rule.group"></query-builder>
+<form [formGroup]="filterForm">
+	<ng-template #queryTemplateRef let-filter='filter' let-groupToRemove='groupToRemove'>
+		<div class="alert alert-dark" role="alert">
+			<div class="row">
+				<!-- logical operators -->
+				<!-- <select class="form-control input-sm"></select> -->
+				<div class="col-2">
+					<input class="form-control" type="text" formControlName="logicalOperator">
 				</div>
-				<div ng-switch-default="ng-switch-default">
-					<div class="form-inline">
-						<select ng-options="t.name as t.name for t in fields" ng-model="rule.field" class="form-control input-sm"></select>
-						<select style="margin-left: 5px" ng-options="c.name as c.name for c in conditions" ng-model="rule.condition" class="form-control input-sm"></select>
-						<input style="margin-left: 5px" type="text" ng-model="rule.data" class="form-control input-sm"/>
-						<button style="margin-left: 5px" ng-click="removeCondition($index)" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-minus-sign"></span></button>
+					<div class="col-2">
+						<button style="margin-left: 5px" (click)="addField(filter)" class="btn btn-sm btn-success">
+						<span class="glyphicon glyphicon-plus-sign"></span>
+						Add Field
+					</button>
+					</div>
+					<div class="col-2">
+						<button style="margin-left: 5px" (click)="addGroup(filter)" class="btn btn-sm btn-success">
+						<span class="glyphicon glyphicon-plus-sign"></span>
+						Add Group
+					</button>
+					</div>
+					<div class="col-6">
+						<button *ngIf="groupToRemove" style="margin-left: 5px" (click)="removeGroup(groupToRemove)"
+						class="btn btn-sm btn-danger">
+						<span class="glyphicon glyphicon-minus-sign"></span>
+						Remove Group
+					</button>
 					</div>
 				</div>
-			</div>
-		</div>
-	</div>
-</div>
+
+				<div *ngIf="filter.value.filters && filter.value.filters.length > 0 " class="child-query"
+					formArrayName="filters">
+					<!-- field condition -->
+					<div *ngFor="let childFilter of filter.get('filters').controls; let fieldGroup = index;">
+						<div class="row mt-1" *ngIf="!childFilter.value.logicalOperator; else nestedFilter"
+							style="margin-left: 2%;" [formGroup]="childFilter">
+							<div class="col"><input class="form-control" type="text" formControlName="name"></div>
+								<!-- <input class="form-control input-sm" type="text" formControlName="type"> -->
+								<div class="col">
+									<input class="form-control" type="text" formControlName="relationalOperator">
+						</div>
+									<div class="col">
+										<input class="form-control" type="text" formControlName="value">
+						</div>
+										<div class="col">
+											<button style="margin-left: 5px" (click)="removeField(filter, fieldGroup)"
+								class="btn btn-sm btn-danger">
+								<span class="glyphicon glyphicon-minus-sign"></span>
+								Remove
+							</button>
+										</div>
+									</div>
+									<ng-template #nestedFilter>
+										<div class="mt-2" [formGroup]="childFilter">
+											<ng-template [ngTemplateOutlet]="queryTemplateRef"
+												[ngTemplateOutletContext]="{ filter: childFilter, groupToRemove: { group: filter, index: fieldGroup} }">
+											</ng-template>
+										</div>
+									</ng-template>
+								</div>
+							</div>
+						</div>
+	</ng-template>
+	<ng-template [ngTemplateOutlet]="queryTemplateRef"
+		[ngTemplateOutletContext]="{ filter: filterForm, removeGroup: null }">
+	</ng-template>
+</form>

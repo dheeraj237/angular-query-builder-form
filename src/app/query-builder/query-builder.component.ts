@@ -1,5 +1,11 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { FormArray, FormControl, FormGroup } from "@angular/forms";
+import {
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators
+} from "@angular/forms";
 import { Observable } from "rxjs";
 
 @Component({
@@ -12,9 +18,11 @@ export class QueryBuilderComponent implements OnInit {
   queryForm: FormGroup;
   filterForm: FormGroup;
 
+  count = 0;
+
   filterString: string;
 
-  constructor() {}
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
     this.initializeData();
@@ -22,60 +30,94 @@ export class QueryBuilderComponent implements OnInit {
 
   initializeData(): void {
     this.filterForm = new FormGroup({
-      name: new FormControl(""),
-      logicalOperator: new FormControl(""),
-      type: new FormControl(""),
-      value: new FormControl(""),
-      relationalOperator: new FormControl(""),
+      logicalOperator: new FormControl("AND", Validators.required),
       filters: new FormArray([])
     });
-    this.filterForm.disable();
-    this.queryForm.controls.filters = new FormGroup({
-      logicalOperator: new FormControl("OR"),
-      filters: new FormArray([
-        new FormGroup({
-          logicalOperator: new FormControl("AND"),
-          filters: new FormArray([
-            new FormGroup({
-              name: new FormControl("3333"),
-              type: new FormControl("string"),
-              value: new FormControl("3333"),
-              relationalOperator: new FormControl("="),
-              filters: new FormArray([])
-            }),
-            new FormGroup({
-              name: new FormControl("4444"),
-              type: new FormControl("string"),
-              value: new FormControl("4444"),
-              relationalOperator: new FormControl("="),
-              filters: new FormArray([])
-            })
-          ])
-        }),
-        new FormGroup({
-          name: new FormControl("2222"),
-          type: new FormControl("string"),
-          value: new FormControl("2222"),
-          relationalOperator: new FormControl("="),
-          filters: new FormArray([])
-        })
-      ])
-    });
+    // this.filterForm.disable();
+    // this.queryForm.controls.filters = new FormGroup({
+    // 	logicalOperator: new FormControl("OR"),
+    // 	filters: new FormArray([
+    // 		new FormGroup({
+    // 			logicalOperator: new FormControl("AND"),
+    // 			filters: new FormArray([
+    // 				new FormGroup({
+    // 					name: new FormControl("3333"),
+    // 					type: new FormControl("string"),
+    // 					value: new FormControl("3333"),
+    // 					relationalOperator: new FormControl("="),
+    // 					filters: new FormArray([]),
+    // 				}),
+    // 				new FormGroup({
+    // 					name: new FormControl("4444"),
+    // 					type: new FormControl("string"),
+    // 					value: new FormControl("4444"),
+    // 					relationalOperator: new FormControl("="),
+    // 					filters: new FormArray([]),
+    // 				}),
+    // 			]),
+    // 		}),
+    // 		new FormGroup({
+    // 			name: new FormControl("2222"),
+    // 			type: new FormControl("string"),
+    // 			value: new FormControl("2222"),
+    // 			relationalOperator: new FormControl("="),
+    // 			filters: new FormArray([]),
+    // 		}),
+    // 	]),
+    // });
 
-    this.queryForm.controls.columns.valueChanges.subscribe(value => {
-      if (value.length !== 0 && value[0].groupingType) {
-        this.filterForm.enable();
-      } else {
-        this.filterForm.enable();
-      }
-    });
+    // this.queryForm.controls.columns.valueChanges.subscribe((value) => {
+    // 	if (value.length !== 0 && value[0].groupingType) {
+    // 		this.filterForm.enable();
+    // 	} else {
+    // 		this.filterForm.enable();
+    // 	}
+    // });
 
-    this.queryForm.controls.filters.valueChanges.subscribe(value => {
+    this.filterForm.valueChanges.subscribe(value => {
       if (value) {
+        console.log("filterForm changes", value);
+
         this.filterString = this.computed(value);
       }
     });
   }
+
+  get field(): FormGroup {
+    return new FormGroup({
+      name: new FormControl("field-" + this.count),
+      type: new FormControl("type-" + this.count),
+      value: new FormControl(this.count++),
+      relationalOperator: new FormControl("="),
+      filters: new FormArray([])
+    });
+  }
+
+  get filter(): FormGroup {
+    return new FormGroup({
+      logicalOperator: new FormControl("OR"),
+      filters: new FormArray([])
+    });
+  }
+
+  addField(form: FormGroup) {
+    (form.get("filters") as FormArray).push(this.field);
+  }
+
+  removeField(form: FormGroup, fieldIndex: number) {
+    (form.get("filters") as FormArray).removeAt(fieldIndex);
+  }
+
+  addGroup(form: FormGroup) {
+    (form.get("filters") as FormArray).push(this.filter);
+  }
+
+  removeGroup(groupToRemove: any) {
+    (groupToRemove.group.get("filters") as FormArray).removeAt(
+      groupToRemove.index
+    );
+  }
+
   htmlEntities(str) {
     return String(str)
       .replace(/</g, "&lt;")
@@ -91,14 +133,16 @@ export class QueryBuilderComponent implements OnInit {
       if (i > 0) {
         str += ` ` + filter.logicalOperator + ` `;
       }
-      str +=
-        filter.filters[i].filters.length !== 0
-          ? this.computed(filter.filters[i])
-          : filter.filters[i].name +
-            " " +
-            this.htmlEntities(filter.filters[i].relationalOperator) +
-            " " +
-            filter.filters[i].value;
+      if (filter.filters[i] && filter.filters[i].filters.length !== 0) {
+        str += this.computed(filter.filters[i]);
+      } else {
+        str +=
+          filter.filters[i].name +
+          " " +
+          this.htmlEntities(filter.filters[i].relationalOperator) +
+          " " +
+          filter.filters[i].value;
+      }
     }
 
     return str + ")";
