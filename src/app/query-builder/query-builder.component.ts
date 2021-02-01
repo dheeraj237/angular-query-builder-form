@@ -6,7 +6,6 @@ import {
   FormGroup,
   Validators
 } from "@angular/forms";
-import { Observable } from "rxjs";
 
 @Component({
   selector: "query-builder",
@@ -37,7 +36,6 @@ export class QueryBuilderComponent implements OnInit {
     this.filterForm.valueChanges.subscribe(value => {
       if (value) {
         console.log("filterForm changes", value);
-
         this.filterString = this.computed(value);
       }
     });
